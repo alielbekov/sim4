@@ -81,12 +81,3 @@ void extract_instructionFields(WORD instruction, InstructionFields *fieldsOut) {
     fieldsOut->imm32   = signExtend16to32(fieldsOut->imm16); // Sign-extend imm16
     fieldsOut->address = instruction & 0x3FFFFFF;    // Bottom 26 bits for J type
 }
-
-
-// Implement the getInstruction function
-WORD getInstruction(WORD curPC, WORD *instructionMemory) {
-   
-    
-    int index = curPC / 4;
-    return instructionMemory[index];
-}
