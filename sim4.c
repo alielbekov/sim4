@@ -1,13 +1,18 @@
-#include <stdio.h>
-#include <string.h> 
-#include "sim4.h" 
 
+/*
+Author: Ali Elbekov
+Class: CSc 252
+Assignment: SIM4 part 1
+Description: This file has two function that help us to implement the single cycle CPU simulator.
+The first function is fill_CPUControl, which takes in the instruction fields and fills in the control signals.
+The second function is extract_instructionFields, which takes in the instruction and extracts the fields from it.
+*/
 
 // Single cycle CPU simulator
-
-
 #include <stdio.h>
 #include "sim4.h"
+#include <string.h> 
+
 
 int fill_CPUControl(InstructionFields *fields, CPUControl *controlOut) {
     memset(controlOut, 0, sizeof(CPUControl)); // Clear the control signals
@@ -24,7 +29,7 @@ int fill_CPUControl(InstructionFields *fields, CPUControl *controlOut) {
                 case 0x22: // SUB
                 case 0x23: // SUBU
                     controlOut->ALU.op = 2; // Assume ALU.op = 2 is for SUB
-                    controlOut->ALU.bNegate = 1;
+                    controlOut->ALU.bNegate = 1; // Set negate for subtraction
                     break;
                 case 0x24: // AND
                     controlOut->ALU.op = 0; 
@@ -37,7 +42,7 @@ int fill_CPUControl(InstructionFields *fields, CPUControl *controlOut) {
                     break;
                 case 0x2A: // SLT
                     controlOut->ALU.op = 3; 
-                    controlOut->ALU.bNegate = 0; // For SLT, it's a comparison, not direct subtraction
+                    controlOut->ALU.bNegate = 1; // Important for correct SLT operation
                     break;
                 default:
                     return 0; // Unrecognized funct code
@@ -55,13 +60,14 @@ int fill_CPUControl(InstructionFields *fields, CPUControl *controlOut) {
             break;
         case 0x04: // BEQ
             controlOut->branch = 1;
-            controlOut->ALU.op = 2; 
-            controlOut->ALU.bNegate = 1; // To subtract and compare for equality
+            controlOut->ALU.op = 2;
+            controlOut->ALU.bNegate = 1; // Set negate for subtraction/comparison
             break;
         case 0x0A: // SLTI
             controlOut->ALUsrc = 1;
             controlOut->regWrite = 1;
             controlOut->ALU.op = 3; // Using SLT operation with immediate
+            controlOut->ALU.bNegate = 1; // Set negate for comparison
             break;
         case 0x02: // J
             controlOut->jump = 1;
@@ -98,12 +104,8 @@ void extract_instructionFields(WORD instruction, InstructionFields *fieldsOut) {
     fieldsOut->address = instruction & 0x3FFFFFF;    // Bottom 26 bits for J type
 }
 
-//??
 
 WORD getInstruction(WORD curPC, WORD *instructionMemory) {
     int index = curPC / 4;
     return instructionMemory[index]; 
 }
-
-
-
